@@ -13,6 +13,8 @@
 (async function() {
     'use strict';
 
+    const goodMargin = 0.20;
+
     const marketplaceKeyPrice = 1.9;
 
     const icons = document.createElement("link");
@@ -287,7 +289,7 @@
 
                 if (difference > 0) {
                     differenceIndicator.textContent = percentDifferenceString + " 🡅";
-                    if (percentDifference >= 0.20) differenceIndicator.style.color = "#2fd65c";
+                    if (percentDifference >= goodMargin) differenceIndicator.style.color = "#2fd65c";
                 }
                 else {
                     listing.style.opacity = 0.5;

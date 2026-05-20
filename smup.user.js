@@ -237,6 +237,7 @@
                 aspectRatio: 1,
                 display: "flex",
                 backgroundSize: "contain",
+                flexShrink: 0,
             });
 
             const loader = document.createElement("span");

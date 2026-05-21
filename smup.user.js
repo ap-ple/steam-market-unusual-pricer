@@ -17,6 +17,8 @@
 
     const marketplaceKeyPrice = 1.9;
 
+    const strangeQuality = "11";
+
     const icons = document.createElement("link");
     document.head.appendChild(icons);
     icons.rel = "stylesheet";
@@ -69,12 +71,14 @@
         });
     }
 
-    if (window.location.href.includes("/Strange")) {
+    const itemIsStrange = window.location.href.includes("/Strange");
+
+    if (itemIsStrange) {
         const heading = document.querySelector(".market_section_title");
         const warning = document.createElement("span");
         heading.appendChild(warning);
         warning.className = "material-symbols-outlined";
-        warning.title = "Suggested prices and profit margins displayed are for non-strange items";
+        warning.title = "Suggested prices displayed are for non-strange items";
         warning.textContent = "warning";
         warning.style.color = "#EAC452";
         warning.style.cursor = "help";
@@ -138,18 +142,25 @@
 
         const [sellOrders, buyOrders] = [...page.querySelectorAll(".col-md-6")].map(div => div.querySelector(".media-list"));
 
-        const firstSellOrderText = sellOrders?.querySelector(".bottom-right span").innerText.replace(",", "");
+        let firstSellOrderPrice;
 
-        let firstSellOrder;
+        if (sellOrders) {
+            const firstSellOrder = sellOrders.querySelector(".item");
 
-        if (firstSellOrderText) {
-            firstSellOrder = firstSellOrderText.startsWith("$") ? (parseFloat(firstSellOrderText.substring(1)) / marketplaceKeyPrice) : (parseFloat(firstSellOrderText));
+            if (!firstSellOrder.dataset.spell_1 && ((firstSellOrder.dataset.quality_elevated === strangeQuality) === itemIsStrange)) {
+                const firstSellOrderText = firstSellOrder.querySelector(".bottom-right span");
+                firstSellOrderPrice = parseFloat(firstSellOrderText.textContent.replace("$", ""));
+
+                if (!firstSellOrder.dataset.listing_price) {
+                    firstSellOrderPrice /= marketplaceKeyPrice;
+                }g
+            }
         }
 
         return {
             suggestedPrice,
-            firstSellOrder,
-            //firstBuyOrder
+            firstSellOrderPrice,
+            //firstBuyOrderPrice
         };
     }
     async function getPriceIndex(url) {
@@ -272,14 +283,14 @@
                 listingSuggestedPrice.style.cursor = "help";
             }
 
-            if (listingStats.firstSellOrder) {
+            if (listingStats.firstSellOrderPrice) {
                 const differenceIndicator = document.createElement("div");
                 listingHeader.appendChild(differenceIndicator);
                 differenceIndicator.title = "Maximum profit margin";
                 differenceIndicator.style.cursor = "help";
                 differenceIndicator.style.color = "#5B5B5B";
 
-                const lowestSellOrder = parseFloat(listingStats.firstSellOrder);
+                const lowestSellOrder = parseFloat(listingStats.firstSellOrderPrice);
                 const difference = lowestSellOrder - listingKeyPrice;
                 const percentDifference = difference / listingKeyPrice;
                 const percentDifferenceString = percentDifference

@@ -132,33 +132,36 @@
             }
         }
 
-        let suggestedPrice;
-
         const priceBox = page.querySelector(".price-box");
+
+        const [sellOrders, buyOrders, proposedPrices] = [...page.querySelectorAll(".col-md-6")];
+
+        let suggestedPrice;
 
         if (priceBox?.title === "backpack.tf Community") {
             suggestedPrice = priceBox.querySelector(".value").textContent.trim();
         }
 
-        const [sellOrders, buyOrders] = [...page.querySelectorAll(".col-md-6")].map(div => div.querySelector(".media-list"));
+        const proposedPrice = proposedPrices?.querySelector(".price-new")?.textContent.trim();
 
         let firstSellOrderPrice;
 
-        if (sellOrders) {
-            const firstSellOrder = sellOrders.querySelector(".item");
+        const firstSellOrder = sellOrders.querySelector(".item")
 
+        if (firstSellOrder) {
             if (!firstSellOrder.dataset.spell_1 && ((firstSellOrder.dataset.quality_elevated === strangeQuality) === itemIsStrange)) {
                 const firstSellOrderText = firstSellOrder.querySelector(".bottom-right span");
                 firstSellOrderPrice = parseFloat(firstSellOrderText.textContent.replace("$", ""));
 
                 if (!firstSellOrder.dataset.listing_price) {
                     firstSellOrderPrice /= marketplaceKeyPrice;
-                }g
+                }
             }
         }
 
         return {
             suggestedPrice,
+            proposedPrice,
             firstSellOrderPrice,
             //firstBuyOrderPrice
         };
@@ -275,12 +278,19 @@
 
             loader.remove();
 
-            if (listingStats.suggestedPrice) {
+            if (listingStats.proposedPrice) {
                 const listingSuggestedPrice = document.createElement("div");
                 listingHeader.appendChild(listingSuggestedPrice);
                 listingSuggestedPrice.textContent = listingStats.suggestedPrice;
                 listingSuggestedPrice.title = "backpack.tf Suggested Price";
                 listingSuggestedPrice.style.cursor = "help";
+
+                if (!listingStats.suggestedPrice) {
+                    listingSuggestedPrice.textContent = listingStats.proposedPrice;
+                    listingSuggestedPrice.title = "backpack.tf Proposed Price";
+                    //listingSuggestedPrice.style.fontStyle = "italic";
+                    listingSuggestedPrice.style.textDecoration = "underline dotted";
+                }
             }
 
             if (listingStats.firstSellOrderPrice) {
